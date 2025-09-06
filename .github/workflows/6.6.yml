@@ -155,7 +155,7 @@ jobs:
         fail_on_unmatched_files: false
 
     - name: 删除工作流运行
-      uses: Mattraks/delete-workflow-runs@v0.2.1
+      uses: Mattraks/delete-workflow-runs@v2
       with:
         retain_days: 0       # 不保留历史记录
         keep_minimum_runs: 10 # 但至少保留2个最新记录
