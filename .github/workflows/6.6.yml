@@ -130,6 +130,9 @@ jobs:
          在源码package/base-files/files/usr/添加bin文件夹/bin目录添加了netconfig-boot文件
          在diy-part2.sh中添加给netconfig-boot权限的命令和rc.local 在启动时运行 netconfig-boot的命令
          diy-part2.sh还有检查netconfig-boot是否存在及rc.local是否已添加启动命令。
+         --------------------------------------------------------------------
+         2025-9-8
+         v1版：netconfig-boot新增检查root/netconfig文件是否已存在，如果已经存在则不用下载
          ---------------------------------------------------------------------
          默认网关：192.168.100.10这个不确定
          登录密码：--
