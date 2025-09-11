@@ -8,7 +8,7 @@ env:
   REPO_URL: https://github.com/hzyuan1985/immortalwrt-mt798x-6.6
   REPO_BRANCH: openwrt-24.10-6.6
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 20250911-6.6.config
+  CONFIG_FILE: 20250911-6.6-2.config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: false
@@ -134,7 +134,7 @@ jobs:
          2025-9-8
          v1版：netconfig-boot新增检查root/netconfig文件是否已存在，如果已经存在则不用下载
          ---------------------------------------------------------------------
-         20250911
+         20250911（20250911-6.6.config）
          V1.1版
          原增插件
          luci-app-adguardhome （引起编译失败，取消了）
@@ -149,7 +149,7 @@ jobs:
          luci-app-overview-widgets---------------自制优化概述
          aliyundrive-webdav----------------------阿里云盘webdav
          ---------------------------------------------------------------------
-         V1.2版
+         V1.2版（20250911-6.6-2.config）
          编译后太大了删除
          luci-app-dockerman
          ---------------------------------------------------------------------
