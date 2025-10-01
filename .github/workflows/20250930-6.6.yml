@@ -1,5 +1,5 @@
 
-name: 202509306.6
+name: 2025010016.6
 
 on:
   repository_dispatch:
@@ -9,7 +9,7 @@ env:
   REPO_URL: https://github.com/hzyuan1985/immortalwrt-mt798x-6.6
   REPO_BRANCH: openwrt-24.10-6.6
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 20250930-6.6.config
+  CONFIG_FILE: 20251001-6.6.config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: false
@@ -132,6 +132,9 @@ jobs:
          在diy-part2.sh中添加给netconfig-boot权限的命令和rc.local 在启动时运行 netconfig-boot的命令
          diy-part2.sh还有检查netconfig-boot是否存在及rc.local是否已添加启动命令。
          --------------------------------------------------------------------
+         2025-10-01
+         V2.1.1版：新增davfs2
+         ---------------------------------------------------------------------
          2025-9-30
          V2.1版：修复阿里云盘webdav 源码
          插件列表
@@ -149,7 +152,7 @@ jobs:
          | luci-app-smartdns                                            | DNS                     |
          | luci-app-ttyd                                                | 终端                    |
          | luci-app-uhttpd                                              | 导航使用的WEB服务       |
-
+         | davfs2                                                       | 新增davfs2       |
          --------------------------------------------------------------------
          2025-9-28
          V2版：netconfig-boot新增备用下载gitee
