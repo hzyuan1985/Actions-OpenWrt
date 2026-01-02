@@ -1,0 +1,274 @@
+
+
+name: 202512316.6
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+
+env:
+  REPO_URL: https://github.com/hzyuan1985/immortalwrt-mt798x-6.6
+  REPO_BRANCH: openwrt-24.10-6.6
+  FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: 20260103-6.6.config
+  DIY_P1_SH: diy-part1.sh
+  DIY_P2_SH: diy-part2.sh
+  UPLOAD_BIN_DIR: false
+  UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: true
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+    - name: 检查项目分支
+      uses: actions/checkout@v4
+
+    - name: 初始化编译环境
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+        sudo docker image prune --all --force
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool lrzsz mkisofs msmtp ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        echo "FIRMWARE_VERSION=$(date +"%y%m%d")" >> $GITHUB_ENV
+        echo "START_DATE=$(date +'%Y年%m月%d日 %H点%M分%S秒')" >> $GITHUB_ENV        
+
+    - name: 下载源码
+      working-directory: /workdir
+      run: |
+        df -hT $PWD
+        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+
+    - name: 加载软件源
+      run: |
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
+
+    - name: 更新软件源
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: 安装软件源
+      run: cd openwrt && ./scripts/feeds install -a
+
+    - name: 加载自定义配置
+      run: |
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x $DIY_P2_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P2_SH
+
+    - name: 下载包
+      id: package
+      run: |
+        cd openwrt
+        make defconfig
+        make download -j8
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
+
+    - name: 编译固件
+      id: compile
+      run: |
+        cd openwrt
+        echo -e "$(nproc) thread compile"
+        make -j$(nproc) || make -j1 || make -j1 V=s
+        echo "status=success" >> $GITHUB_OUTPUT
+        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
+        [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
+        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+
+    - name: 检查存储空间
+      if: (!cancelled())
+      run: df -hT
+
+    - name: 上传bin目录
+      uses: actions/upload-artifact@v4
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      with:
+        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: openwrt/bin
+
+    - name: 整理固件文件
+      id: organize
+      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      run: |
+        cd openwrt/bin/targets/*/*
+        rm -rf packages
+        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: 上传固件到Github Action空间
+      uses: actions/upload-artifact@v4
+      if: steps.organize.outputs.status == 'success' && !cancelled()
+      with:
+        name: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
+        path: ${{ env.FIRMWARE }}
+
+    - name: 创建release标签
+      id: tag
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      run: |
+         time=$(date +%Y.%m.%d)
+         release_tag="237-ImmortalWrt-24.10-360T7-108m-$time"
+         release_name="237-ImmortalWrt-24.10-360T7-108m-$time"
+         echo "固件：306T7-108m 使用的是237大佬的源码云编译
+         237大佬源码网址: https://github.com/padavanonly/immortalwrt-mt798x-24.10
+         6.6----------------------------------------------------------------
+         在源码package/base-files/files/usr/添加bin文件夹/bin目录添加了netconfig-boot文件
+         在diy-part2.sh中添加给netconfig-boot权限的命令和rc.local 在启动时运行 netconfig-boot的命令
+         diy-part2.sh还有检查netconfig-boot是否存在及rc.local是否已添加启动命令。
+         --------------------------------------------------------------------
+         2026-01-03
+         取消aria2
+         增加：
+         luci-app-unishare...........................取消
+          luci-app-xunlei...........................取消
+         luci-app-samba4...........................集成测试
+         luci-app-wolplus...........................集成测试(修正源码翻译）
+         luci-app-vlmcsd（ksm服务器)...........................集成测试
+         luci-app-wifidog...........................集成测试
+         luci-app-cloudflarespeedtest...............（集成并给于权限）
+         luci-app-sunpanel...........................集成测试（修正源码）
+         修正netconfig-boot
+         --------------------------------------------------------------------
+         2025-10-07
+         V3.1版：源码集成netconfig。
+         ---------------------------------------------------------------------
+         2025-10-03
+         V3版：新增aria2
+         2025-10-3  
+         V3.0版
+         **重大更新。之后的都要临时在源文件添加密码.保存固件后删除固件及密码**
+         源码路径：/package/base-files/files/usr/bin/backup-password
+         diy-part2.sh 予密码文件权限设置为600，仅root可读
+         添加aria2插件
+         增加gnupg加密插件（libreadline8 依赖）-> Utilities-> Encryption
+         每次恢复都要添加创建mnt/nas-aliyun两个文件夹         
+         --------------------------------------------------------------------
+         2025-10-01
+         V2.1.1版：新增davfs2
+         ---------------------------------------------------------------------
+         2025-9-30
+         V2.1版：修复阿里云盘webdav 源码
+         插件列表
+         | make menuconfig：                                            |                         |
+         | :----------------------------------------------------------- | ----------------------- |
+         | luci-app-AdGuardHome                                         | 这个要看上面安装DNS     |
+         | luci-app-aliyundrive-webdav                                  | 阿里云盘webdav          |
+         | luci-app-lucky                                               | 功能模块                |
+         | luci-app-openvpn-serve                                       | 回家                    |
+         | luci-app-overview-widgets                                    | 概述                    |
+         | luci-app-oaf                                                 | 应用过滤                |
+         | luci-app-passwall                                            | 飞机                    |
+         | php8：<br />php8 php8-cgi<br />php8-mod-ctype<br />php8-mod-session<br />php8-mod-sqlite3 | 导航使用的WEB服务的依赖 |
+         | luci-app-pushbot                                             | 全能推送                |
+         | luci-app-smartdns                                            | DNS                     |
+         | luci-app-ttyd                                                | 终端                    |
+         | luci-app-uhttpd                                              | 导航使用的WEB服务       |
+         | davfs2                                                       | davfs2       |
+         | aria2                                                       | V3.0版新增      |
+         | gnupg                                                       |V3.0版新增 加密插件       |  
+         --------------------------------------------------------------------
+         2025-9-28
+         V2版：netconfig-boot新增备用下载gitee
+         URL1="http://192.168.100.253/360T7/netconfig"  # 局域网URL
+         URL2="https://gitee.com/hziqian/txt/raw/master/360T7/netconfig"  # Gitee备用URL
+         插件列表
+         luci-app-openvpn-serve	
+         luci-app-passwall	
+         luci-app-smartdns	
+         luci-app-overview-widgets	
+         luci-app-uhttpd	
+         luci-app-adguardhome 	
+         luci-app-ttyd	
+         luci-app-oaf	
+         php8：php8 php8-cgi php8-mod-session php8-mod-sqlite3 php8-mod-ctype	
+         luci-app-lucky 	
+         aliyundrive-webdav	
+         全能推送pushbot	
+        
+         下面面两个没有集成
+         luci-app-mwan3	
+         kms服务器
+         --------------------------------------------------------------------
+         ====================================================================
+         2025-9-8
+         v1版：netconfig-boot新增检查root/netconfig文件是否已存在，如果已经存在则不用下载
+         ---------------------------------------------------------------------
+         20250911（20250911-6.6.config）
+         V1.1版
+         原增插件
+         luci-app-adguardhome （引起编译失败，取消了）
+         luci-app-ddns-go------------------动态IP域名解析
+         luci-app-openvpn-serve--------------------------回🏠
+         luci-app-passwall------------------------------------代理
+         luci-app-smartdns------------------------------------DNS
+         luci-app-wol------------------------------------开机
+         新增插件
+         luci-app-dockerman
+         luci-app-wechatpush---------------------微信推送
+         luci-app-overview-widgets---------------自制优化概述
+         aliyundrive-webdav----------------------阿里云盘webdav
+         luci-app-uhttpd---------------------web服务器
+         ---------------------------------------------------------------------
+         V1.2版（20250911-6.6-2.config）
+         编译后太大了删除
+         luci-app-dockerman
+         ---------------------------------------------------------------------
+
+         默认网关：192.168.100.10
+         登录密码：--
+         ">> release.txt
+         echo "release_name=$release_name" >> $GITHUB_OUTPUT
+         echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
+         echo "status=success" >> $GITHUB_OUTPUT
+
+    - name: 检查release文件
+      run: |
+        ls -la ${{ env.FIRMWARE }}
+        [ -f release.txt ] || echo "默认描述" > release.txt
+
+    - name: 将固件上传到release
+      uses: softprops/action-gh-release@v1
+      if: steps.tag.outputs.status == 'success' && !cancelled()
+      with:
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        name: ${{ steps.tag.outputs.release_name }}
+        body_path: release.txt
+        files: |
+          ${{ env.FIRMWARE }}/*.bin
+          ${{ env.FIRMWARE }}/*.img
+          ${{ env.FIRMWARE }}/*.gz
+        draft: false
+        prerelease: false
+        fail_on_unmatched_files: false
+
+    - name: 删除工作流运行
+      uses: Mattraks/delete-workflow-runs@v2
+      with:
+        retain_days: 0       # 不保留历史记录
+        keep_minimum_runs: 10 # 但至少保留2个最新记录
+
+    - name: 删除旧的releases
+      uses: dev-drprasad/delete-older-releases@v0.2.1
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        keep_latest: 30   # 保留最新的30个Release
+        delete_tags: true   # 同时删除关联的标签
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
