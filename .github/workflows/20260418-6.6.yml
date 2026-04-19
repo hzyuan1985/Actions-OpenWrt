@@ -128,6 +128,12 @@ jobs:
          release_name="237-ImmortalWrt-24.10-360T7-108m-$time"
          echo "v4版后只显示最新更新内容
          --------------------------------------------------------------------
+         2026-04-19 修复WireGuard导致的ipv6地址获取慢。防火墙删除
+         # ------------- 下面这一条必须删除 -------------
+         # config forwarding
+         #        option src 'wan'
+         #        option dest 'wireGuard'
+         
          2026-04-18
          新增：luci-app-cloudflare 
           WireGuard VPN 并配置好网络、防火墙
