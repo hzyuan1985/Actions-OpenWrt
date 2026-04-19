@@ -1,6 +1,6 @@
 
 
-name: 20260418-6.6
+name: 20260420-6.6
 
 on:
   repository_dispatch:
@@ -10,7 +10,7 @@ env:
   REPO_URL: https://github.com/hzyuan1985/immortalwrt-mt798x-6.6
   REPO_BRANCH: openwrt-24.10-6.6
   FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: 20260418-6.6.config
+  CONFIG_FILE: 20260420-6.6.config
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   UPLOAD_BIN_DIR: false
@@ -128,7 +128,7 @@ jobs:
          release_name="237-ImmortalWrt-24.10-360T7-108m-$time"
          echo "v4版后只显示最新更新内容
          --------------------------------------------------------------------
-         2026-04-20 优化版本
+         2026-04-20 优化版本 优化netconfig.tar.gz.gpg 的openvpn备份
          删除：luci-app-oaf  luci-app-cloudflare luci-app-vlmcsd luci-app-samba4
          luci-app-wifidog  luci-app-openvpn-admin 
          -------------------------------------------------------------------- 
