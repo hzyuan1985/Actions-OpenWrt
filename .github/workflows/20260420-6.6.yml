@@ -131,6 +131,7 @@ jobs:
          2026-04-20 优化版本 优化netconfig.tar.gz.gpg 的openvpn备份
          删除：luci-app-oaf  luci-app-cloudflare luci-app-vlmcsd luci-app-samba4
          luci-app-wifidog  luci-app-openvpn-admin 
+         luci-app-sunpanel（openwrt-apps重新上传，修改源码翻译文件）
          -------------------------------------------------------------------- 
          2026-04-19 修复WireGuard导致的ipv6地址获取慢。防火墙删除
          # ------------- 下面这一条必须删除 -------------
