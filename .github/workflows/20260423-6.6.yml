@@ -149,10 +149,10 @@ jobs:
          ```
 
          源码固件集成：/package/base-files/files/usr/bin/
-         1.[backup-password](https://github.com/hzyuan1985/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/backup-password)加密密码文本
-         2.[netconfig-boot](https://github.com/hzyuan1985/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/netconfig-boot)首次安装固件或恢复固件运行一次
-         3.[netconfig.tar.gz.gpg](https://github.com/hzyuan1985/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/netconfig.tar.gz.gpg)初始网络加密恢复包
-         4.[network-pppoe](https://github.com/hzyuan1985/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/network-pppoe)最初始的网络文件，主要是上网下载恢复包的。恢复后会覆盖。
+         1.[backup-password](https://github.com/？/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/backup-password)加密密码文本
+         2.[netconfig-boot](https://github.com/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/netconfig-boot)首次安装固件或恢复固件运行一次
+         3.[netconfig.tar.gz.gpg](https://github.com/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/netconfig.tar.gz.gpg)初始网络加密恢复包
+         4.[network-pppoe](https://github.com/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/network-pppoe)最初始的网络文件，主要是上网下载恢复包的。恢复后会覆盖。
 
 
 
