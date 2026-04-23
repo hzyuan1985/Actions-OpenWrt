@@ -128,119 +128,58 @@ jobs:
          release_name="237-ImmortalWrt-24.10-360T7-108m-$time"
          echo "v4版后只显示最新更新内容
          --------------------------------------------------------------------
-         2026-04-23 优化版本 优化netconfig.tar.gz.gpg 的openvpn备份
-         删除：luci-app-oaf  luci-app-cloudflare luci-app-vlmcsd luci-app-samba4
-         luci-app-wifidog  luci-app-openvpn-admin 
-         luci-app-sunpanel（openwrt-apps重新上传，修改源码翻译文件）
-         新增make menuconfig → Utilities → Disc → lsblk（luci-app-sunpanel依赖）
-         -------------------------------------------------------------------- 
-         2026-04-19 修复WireGuard导致的ipv6地址获取慢。防火墙删除
-         # ------------- 下面这一条必须删除 -------------
-         # config forwarding
-         #        option src 'wan'
-         #        option dest 'wireGuard'
-         
-         2026-04-18
-         新增：luci-app-cloudflare 
-          WireGuard VPN 并配置好网络、防火墙
-         
-         --------------------------------------------------------------------
-         2026-01-03
-         取消aria2
-         增加：
-         luci-app-unishare...........................取消
-          luci-app-xunlei...........................取消
-         luci-app-samba4...........................集成测试
-         luci-app-wolplus...........................集成测试(修正源码翻译）
-         luci-app-vlmcsd（ksm服务器)...........................集成测试
-         luci-app-wifidog...........................集成测试
-         luci-app-cloudflarespeedtest...............（集成并给于权限）
-         luci-app-sunpanel...........................集成测试（修正源码）
-         修正netconfig-boot
-         --------------------------------------------------------------------
-         2025-10-07
-         V3.1版：源码集成netconfig。
-         ---------------------------------------------------------------------
-         2025-10-03
-         V3版：新增aria2
-         2025-10-3  
-         V3.0版
-         **重大更新。之后的都要临时在源文件添加密码.保存固件后删除固件及密码**
+         ### 版本更新内容：重置了config文件。重新选择插件
+          ```
+         v1版：
+         netconfig-boot新增检查root/netconfig文件是否已存在，如果已经存在则不用下载
+
+         V1.1版：netconfig-boot新增备用下载gitee
+         URL1=http://192.168.100.253/360T7/netconfig # 局域网URL
+         URL2=https://gitee.com/hziqian/txt/raw/master/360T7/netconfig # Gitee备用URL
+
+         V2.0版
+         重大更新。之后的都要临时在源文件添加密码.保存固件后删除固件及密码
          源码路径：/package/base-files/files/usr/bin/backup-password
          diy-part2.sh 予密码文件权限设置为600，仅root可读
-         添加aria2插件
+         源码集成netconfig加密网络备份和拨号账号密码.修改初始netconfig-boot判断是否拨号（diy-part2.sh集成rc.local 是系统启动时最后执行的脚本，用户可以在这里添加自定义开机启动命令）
+
          增加gnupg加密插件（libreadline8 依赖）-> Utilities-> Encryption
-         每次恢复都要添加创建mnt/nas-aliyun两个文件夹         
-         --------------------------------------------------------------------
-         2025-10-01
-         V2.1.1版：新增davfs2
-         ---------------------------------------------------------------------
-         2025-9-30
-         V2.1版：修复阿里云盘webdav 源码
-         插件列表
-         | make menuconfig：                                            |                         |
-         | :----------------------------------------------------------- | ----------------------- |
-         | luci-app-AdGuardHome                                         | 这个要看上面安装DNS     |
-         | luci-app-aliyundrive-webdav                                  | 阿里云盘webdav          |
-         | luci-app-lucky                                               | 功能模块                |
-         | luci-app-openvpn-serve                                       | 回家                    |
-         | luci-app-overview-widgets                                    | 概述                    |
-         | luci-app-oaf                                                 | 应用过滤                |
-         | luci-app-passwall                                            | 飞机                    |
-         | php8：<br />php8 php8-cgi<br />php8-mod-ctype<br />php8-mod-session<br />php8-mod-sqlite3 | 导航使用的WEB服务的依赖 |
-         | luci-app-pushbot                                             | 全能推送                |
-         | luci-app-smartdns                                            | DNS                     |
-         | luci-app-ttyd                                                | 终端                    |
-         | luci-app-uhttpd                                              | 导航使用的WEB服务       |
-         | davfs2                                                       | davfs2       |
-         | aria2                                                       | V3.0版新增      |
-         | gnupg                                                       |V3.0版新增 加密插件       |  
-         --------------------------------------------------------------------
-         2025-9-28
-         V2版：netconfig-boot新增备用下载gitee
-         URL1="http://192.168.100.253/360T7/netconfig"  # 局域网URL
-         URL2="https://gitee.com/hziqian/txt/raw/master/360T7/netconfig"  # Gitee备用URL
-         插件列表
-         luci-app-openvpn-serve	
-         luci-app-passwall	
-         luci-app-smartdns	
-         luci-app-overview-widgets	
-         luci-app-uhttpd	
-         luci-app-adguardhome 	
-         luci-app-ttyd	
-         luci-app-oaf	
-         php8：php8 php8-cgi php8-mod-session php8-mod-sqlite3 php8-mod-ctype	
-         luci-app-lucky 	
-         aliyundrive-webdav	
-         全能推送pushbot	
-        
-         下面面两个没有集成
-         luci-app-mwan3	
-         kms服务器
-         --------------------------------------------------------------------
-         ====================================================================
-         2025-9-8
-         v1版：netconfig-boot新增检查root/netconfig文件是否已存在，如果已经存在则不用下载
-         ---------------------------------------------------------------------
-         20250911（20250911-6.6.config）
-         V1.1版
-         原增插件
-         luci-app-adguardhome （引起编译失败，取消了）
-         luci-app-ddns-go------------------动态IP域名解析
-         luci-app-openvpn-serve--------------------------回🏠
-         luci-app-passwall------------------------------------代理
-         luci-app-smartdns------------------------------------DNS
-         luci-app-wol------------------------------------开机
-         新增插件
-         luci-app-dockerman
-         luci-app-wechatpush---------------------微信推送
-         luci-app-overview-widgets---------------自制优化概述
-         aliyundrive-webdav----------------------阿里云盘webdav
-         luci-app-uhttpd---------------------web服务器
-         ---------------------------------------------------------------------
-         V1.2版（20250911-6.6-2.config）
-         编译后太大了删除
-         luci-app-dockerman
+         每次恢复都要添加创建mnt/nas-aliyun两个文件夹
+
+         ```
+
+         源码固件集成：/package/base-files/files/usr/bin/
+         1.[backup-password](https://github.com/hzyuan1985/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/backup-password)加密密码文本
+         2.[netconfig-boot](https://github.com/hzyuan1985/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/netconfig-boot)首次安装固件或恢复固件运行一次
+         3.[netconfig.tar.gz.gpg](https://github.com/hzyuan1985/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/netconfig.tar.gz.gpg)初始网络加密恢复包
+         4.[network-pppoe](https://github.com/hzyuan1985/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/network-pppoe)最初始的网络文件，主要是上网下载恢复包的。恢复后会覆盖。
+
+
+
+         ### 插件列表：
+
+         | make menuconfig：                                            | make menuconfig：路径      |                                   |
+         | ------------------------------------------------------------ | -------------------------- | --------------------------------- |
+         | luci-app-AdGuardHome                                         | LuCI → Applications →      | 这个要看上面安装DNS               |
+         | luci-app-aliyundrive-webdav                                  |                            | 阿里云盘webdav                    |
+         | luci-app-lucky                                               |                            | 功能模块                          |
+         | luci-app-overview-widgets                                    |                            | 概述                              |
+         | luci-app-backup                                              |                            | 自制备份恢复插件                  |
+         | luci-app-passwall                                            |                            | 飞机                              |
+         | luci-app-pushbot                                             |                            | 全能推送                          |
+         | luci-app-smartdns                                            |                            | DNS                               |
+         | luci-app-ttyd                                                |                            | 终端                              |
+         | luci-app-uhttpd                                              |                            | 导航使用的WEB服务                 |
+         | luci-app-sunpanel                                            |                            | 替代web服务的导航                 |
+         | luci-app-cloudflarespeedtest                                 |                            | cloudflare优选ip                  |
+         | luci-proto-wireguard                                         | LuCI → Protocols           | VPN                               |
+         |                                                              |                            |                                   |
+         | webdav2                                                      | Network→ File Transfer     | 暂时不选。看看lucky是否集成       |
+         | davfs2                                                       | Network → Filesystem       | davfs2 挂载阿里的插件             |
+         | gnupg                                                        |                            | 加密插件（netconfig脚本自动安装） |
+         | libreadline8                                                 |                            | gnupg 依赖                        |
+         | php8： php8 php8-cgi php8-mod-ctype php8-mod-session php8-mod-sqlite3 | Languages → PHP → php8 | 导航使用的WEB服务的依赖           |
+         | lsblk                                                        | Utilities → Disc → lsblk   | sunpanel 依赖                     |
          ---------------------------------------------------------------------
 
          默认网关：192.168.100.10
