@@ -57,20 +57,4 @@ fi
 #sed -i 's/OpenWrt/P3TERX-Router/g' package/base-files/files/bin/config_generate
 
 # ================================================================
-# 修复添加 (OpenClash 依赖触发) Rust 编译问题
-echo ">>> 正在搜索 Rust Makefile..."
 
-# 使用 find 命令自动定位ILE rust 的 Makefile，兼容不同的目录结构
-RUST_=$(find feeds package -name "Makefile" -path "*/rust/*" 2>/dev/null | head -n 1)
-
-if [ -n "$RUST_MAKEFILE" ] && [ -f "$RUST_MAKEFILE" ]; then
-    echo ">>> 找到 Rust Makefile: $RUST_MAKEFILE"
-    # 执行替换
-    sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' "$RUST_MAKEFILE"
-    echo ">>> Rust Makefile 修改成功"
-else
-    echo ">>> 未通过 find 找到 Rust Makefile，尝试直接修改 build_dir 中的 config.toml..."
-    # 备用方案：直接修改 build_dir 下的 config.toml
-    find build_dir -name "config.toml" -path "*rustc*" -exec sed -i 's/download-ci-llvm = true/download-ci-llvm = false/' {} \; 2>/dev/null || true
-    echo ">>> 备用修改完成"
-fi
