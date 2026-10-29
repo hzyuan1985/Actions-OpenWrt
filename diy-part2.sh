@@ -58,11 +58,15 @@ fi
 
 # ================================================================
 # 修复添加 (OpenClash 依赖触发) Rust 编译问题
+# 修复 Rust 编译问题
 echo ">>> 修复 Rust Host 编译问题..."
-RUST_MAKEFILE="package/feeds/packages/lang/rust/Makefile"
+# 注意这里路径变了，指向 feeds 安装后生成的链接位置
+RUST_MAKEFILE="package/feeds/packages/lang/rust/Makefile" 
+
 if [ -f "$RUST_MAKEFILE" ]; then
     sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' "$RUST_MAKEFILE"
     echo ">>> Rust Makefile 修改成功"
 else
-    echo ">>> 未找到 Rust Makefile，跳过修改"
+    # 如果还是找不到，可以尝试打印一下实际路径，方便排查
+    echo ">>> 未找到 Rust Makefile，请检查路径: $RUST_MAKEFILE"
 fi
