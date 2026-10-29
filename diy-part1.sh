@@ -24,3 +24,14 @@ echo 'src-git aliyundrivewebdav https://github.com/messense/aliyundrive-webdav.g
 
 # 添加 OpenClash 软件源
 echo 'src-git OpenClash https://github.com/vernesong/OpenClash.git' >> feeds.conf.default
+# --- 修复 Rust Host 编译问题 (OpenClash 依赖触发) ---
+# 1. 修改 Rust 的 Makefile，禁用 CI LLVM 下载
+RUST_MAKEFILE="feeds/packages/lang/rust/Makefile"
+if [ -f "$RUST_MAKEFILE" ]; then
+    sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' "$RUST_MAKEFILE"
+    # 针对 CI 环境的额外加固：避免 CI 变量导致 Rust 构建脚本报错
+    sed -i '/x\.py \\/a \        --ci false \\' "$RUST_MAKEFILE"
+fi
+
+# 2. 清理可能残留的 Rust 缓存（云编译环境通常很干净，但加上也无妨）
+rm -rf build_dir/target-*/host/rustc-*-src 2>/dev/null || true
