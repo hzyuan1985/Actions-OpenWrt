@@ -172,9 +172,10 @@ jobs:
          | luci-app-smartdns                                            |                            | DNS                               |
          | luci-app-ttyd                                                |                            | 终端                              |
          | luci-app-uhttpd                                              |                            | 导航使用的WEB服务                 |
-         | luci-app-sunpanel取消了                                          |                            | 替代web服务的导航                 |
+         | luci-app-cloudflare                                          |                            |                  |
          | luci-app-cloudflarespeedtest                                 |                            | cloudflare优选ip                  |
-         | luci-proto-wireguard                                         | LuCI → Protocols           | VPN                               |
+         | luci-proto-openclash                                         |                            | VPN                               |
+         | luci-app-wireguard                                           | LuCI → Protocols           | VPN                               |
          |                                                              |                            |                                   |
          | webdav2                                                      | Network→ File Transfer     | 暂时不选。看看lucky是否集成       |
          | davfs2                                                       | Network → Filesystem       | davfs2 挂载阿里的插件             |
