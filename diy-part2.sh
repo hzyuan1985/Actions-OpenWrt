@@ -58,15 +58,19 @@ fi
 
 # ================================================================
 # 修复添加 (OpenClash 依赖触发) Rust 编译问题
-# 修复 Rust 编译问题
-echo ">>> 修复 Rust Host 编译问题..."
-# 注意这里路径变了，指向 feeds 安装后生成的链接位置
-RUST_MAKEFILE="package/feeds/packages/lang/rust/Makefile" 
+echo ">>> 正在搜索 Rust Makefile..."
 
-if [ -f "$RUST_MAKEFILE" ]; then
+# 使用 find 命令自动定位ILE rust 的 Makefile，兼容不同的目录结构
+RUST_=$(find feeds package -name "Makefile" -path "*/rust/*" 2>/dev/null | head -n 1)
+
+if [ -n "$RUST_MAKEFILE" ] && [ -f "$RUST_MAKEFILE" ]; then
+    echo ">>> 找到 Rust Makefile: $RUST_MAKEFILE"
+    # 执行替换
     sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' "$RUST_MAKEFILE"
     echo ">>> Rust Makefile 修改成功"
 else
-    # 如果还是找不到，可以尝试打印一下实际路径，方便排查
-    echo ">>> 未找到 Rust Makefile，请检查路径: $RUST_MAKEFILE"
+    echo ">>> 未通过 find 找到 Rust Makefile，尝试直接修改 build_dir 中的 config.toml..."
+    # 备用方案：直接修改 build_dir 下的 config.toml
+    find build_dir -name "config.toml" -path "*rustc*" -exec sed -i 's/download-ci-llvm = true/download-ci-llvm = false/' {} \; 2>/dev/null || true
+    echo ">>> 备用修改完成"
 fi
