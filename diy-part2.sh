@@ -55,3 +55,14 @@ fi
 
 # Modify hostname
 #sed -i 's/OpenWrt/P3TERX-Router/g' package/base-files/files/bin/config_generate
+
+# ================================================================
+# 修复添加 (OpenClash 依赖触发) Rust 编译问题
+echo ">>> 修复 Rust Host 编译问题..."
+RUST_MAKEFILE="package/feeds/packages/lang/rust/Makefile"
+if [ -f "$RUST_MAKEFILE" ]; then
+    sed -i 's/--set=llvm\.download-ci-llvm=true/--set=llvm.download-ci-llvm=false/' "$RUST_MAKEFILE"
+    echo ">>> Rust Makefile 修改成功"
+else
+    echo ">>> 未找到 Rust Makefile，跳过修改"
+fi
