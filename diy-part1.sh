@@ -23,4 +23,4 @@ echo 'src-git lucky https://github.com/gdy666/luci-app-lucky' >>feeds.conf.defau
 echo 'src-git aliyundrivewebdav https://github.com/messense/aliyundrive-webdav.git' >> feeds.conf.default
 
 # 添加 OpenClash 软件源
-echo 'src-git aliyundrivewebdav https://github.com/vernesong/OpenClash.git' >> feeds.conf.default
+echo 'src-git OpenClash https://github.com/vernesong/OpenClash.git' >> feeds.conf.default
