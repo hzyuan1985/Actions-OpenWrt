@@ -155,7 +155,7 @@ jobs:
          4.[network-pppoe](https://github.com/immortalwrt-mt798x-6.6/blob/openwrt-24.10-6.6/package/base-files/files/usr/bin/network-pppoe)最初始的网络文件，主要是上网下载恢复包的。恢复后会覆盖。
 
 
-         20260423-6.6 V2.1版本：
+         20260423-6.6 V4.1版本：
          新增：luci-app-cloudflare
          删除:luci-app-sunpanel
          ### 插件列表：
@@ -172,7 +172,7 @@ jobs:
          | luci-app-smartdns                                            |                            | DNS                               |
          | luci-app-ttyd                                                |                            | 终端                              |
          | luci-app-uhttpd                                              |                            | 导航使用的WEB服务                 |
-         | luci-app-sunpanel取消了                                          |                            | 替代web服务的导航                 |
+         | luci-app-cloudflare                                          |                            | Cloudflare Tunnel 功能           |
          | luci-app-cloudflarespeedtest                                 |                            | cloudflare优选ip                  |
          | luci-proto-wireguard                                         | LuCI → Protocols           | VPN                               |
          |                                                              |                            |                                   |
